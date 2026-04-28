@@ -26,14 +26,14 @@ export default function Challenge({difficulty='easy', charColor, setCharColor, s
     // ----
     if(String(e.key).length === 1) {
       if (text[curLetter] === e.key) {
-        setCharColor(charColor.set(curLetter, 'text-correct text-lg'))
+        setCharColor(charColor.set(curLetter, 'text-correct'))
         setCorrectLetters((l) => l+1)
       } else {
-        setCharColor((prev) => prev.set(curLetter, 'text-incorrect text-lg'))
+        setCharColor((prev) => prev.set(curLetter, 'text-incorrect'))
         setIncorrectLetters((l) => l+1)
       }
       setCurLetter((l) => l+1)
-      if(text[curLetter] === ' ') setWords((w) => w+1);
+      if(e.key === ' ') setWords((w) => w+1);
     };
   }
 
