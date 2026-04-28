@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import ChallengeInfo from "./components/ChallengeInfo";
 import Challenge from "./components/Challenge";
 import { getChallenge } from "./actions/challenge";
+import Completed from "./components/Completed";
 
 export default function Home() {
   // Challenge Info
@@ -16,6 +17,7 @@ export default function Home() {
   const [text, setText] = useState<string>('');
   const [curLetter, setCurLetter] = useState<number>(0);
   const [started, setStarted] = useState<boolean>(false);
+  const [completed, setCompleted] = useState<boolean>(true);
   const [arrT, setArrT] = useState<string[]>([]);
 
   const [correctLetters, setCorrectLetters] = useState<number>(0);
@@ -50,7 +52,13 @@ export default function Home() {
     setPrecision(precision.toFixed(2) as unknown as number);
     const time = (finalTime - initialTime) / 1000 / 60; // time in minutes.
     const wpm = words / -time;
-    setWpm(wpm.toFixed(2) as unknown as number);
+    wpm === 0 
+      ? setWpm(1)
+      : setWpm(wpm.toFixed(2) as unknown as number);
+
+    setWords(0);
+    setCorrectLetters(0);
+    setIncorrectLetters(0);
   };
 
   useEffect(() => {
@@ -58,6 +66,8 @@ export default function Home() {
     if(curLetter === arrT.length) {
       setStarted(false);
       results();
+      setCompleted(true);
+      
     }
   },[curLetter]);
 
@@ -67,8 +77,19 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 min-h-screen w-full flex-col items-center justify-start py-32 px-8 bg-white dark:bg-black sm:items-start">
+    <main className="flex min-h-screen bg-zinc-50 font-sans dark:bg-black">
+      <div className={`flex flex-1 justify-center ${completed ? 'visible' : 'hidden'}`}>
+        <Completed
+          wpm={wpm}
+          precision={precision}
+          correctLetters={correctLetters}
+          wrongLetters={incorrectLetters}
+          completed={completed}
+          setCompleted={setCompleted}
+        />
+      </div>
+      
+      <div className={`flex flex-1 min-h-screen w-full flex-col items-center justify-start py-32 px-8 bg-white dark:bg-black sm:items-start ${completed ? 'hidden' : 'visible'}`}>
         <ChallengeInfo
           started={started}
           difficulty={difficulty}
@@ -80,7 +101,7 @@ export default function Home() {
         <div className="relative w-full">
           <button
             onClick={() => setStarted(true)}
-            className={`bg-cyan-400 text-default p-3 rounded-xl absolute left-1/2 top-1/2 cursor-pointer z-50 ${started ? 'hidden' : 'visible'} `}
+            className={`bg-cyan-400 text-default p-3 rounded-xl absolute left-1/2 top-1/2 cursor-pointer z-50 ${started && !completed ? 'hidden' : 'visible'} `}
           >
             Start Typing Test
           </button>
@@ -97,7 +118,7 @@ export default function Home() {
             setWords={setWords}
           />
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
