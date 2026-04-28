@@ -1,48 +1,34 @@
 import { useState, useEffect, Suspense } from 'react';
 
-import { getChallenge } from '../actions/challenge';
-
 interface ChallengeProps{
   difficulty: string;
+  charColor: Map<number, string>;
+  setCharColor: React.Dispatch<React.SetStateAction<Map<number, string>>>;
+  setCurLetter: React.Dispatch<React.SetStateAction<number>>;
+  text: string;
+  curLetter: number;
 };
 
-export default function Challenge({difficulty='easy'}: ChallengeProps) {
-
-  const [text, setText] = useState<string>('');
-  const [charColor, setCharColor] = useState<Map<number,string>>(new Map());
-  const [curLetter, setCurLetter] = useState<number>(0);
+export default function Challenge({difficulty='easy', charColor, setCharColor, setCurLetter, text='', curLetter}: ChallengeProps) {
 
   const handleKeyDown = (e:any) => {
-    console.log('Key pressed: ', e.key);
-    console.log('t: ', text[curLetter] === e.key)
-    console.log('cur: ', text[curLetter]);
-    console.log('map: ', charColor)
+    // for debugging purposes.
+    /*
+      //console.log('Key pressed: ', e.key);
+      //console.log('t: ', text[curLetter] === e.key)
+      //console.log('cur: ', text[curLetter]);
+      //console.log('map: ', charColor)
+    */
+    // ----
     if(String(e.key).length === 1) {
       if (text[curLetter] === e.key) {
-        setCharColor(charColor.set(curLetter, 'text-green-400 text-lg'))
+        setCharColor(charColor.set(curLetter, 'text-correct text-lg'))
       } else {
-        setCharColor((prev) => prev.set(curLetter, 'text-red-400 text-lg'))
+        setCharColor((prev) => prev.set(curLetter, 'text-incorrect text-lg'))
       }
       setCurLetter((l) => l+1)
     };
-
   }
-
-  useEffect(() => {
-    try{
-      setCharColor(new Map())
-      getChallenge(difficulty).then((t) => {
-        setText(t);
-        const arrT = t.split('');
-        arrT.map((c, idx) => {
-          setCharColor(charColor.set(idx, 'text-white'))
-        });
-      });
-      setCurLetter(0);
-    } catch(e) {
-      console.error(e);
-    }
-  },[difficulty]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
