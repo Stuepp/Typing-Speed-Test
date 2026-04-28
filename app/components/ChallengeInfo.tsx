@@ -23,7 +23,7 @@ export default function ChallengeInfo({difficulty='easy', handleDifficulty}: Cha
   
 
   return(
-    <div className="flex flex-row text-gray-400 gap-10 w-full justify-center">
+    <div className='flex flex-row text-gray-400 gap-10 w-full justify-center'>
       <div className="flex flex-row gap-5 items items-center">
         <div className="flex flex-row gap-1.5"><p>WPM:</p> <p className="text-default font-bold">{wpm}</p></div>
         <div className="flex flex-row gap-1.5"><p>Accuracy:</p><p className="text-default font-bold">{accuracy}</p></div>

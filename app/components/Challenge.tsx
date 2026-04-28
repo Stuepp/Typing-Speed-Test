@@ -7,9 +7,10 @@ interface ChallengeProps{
   setCurLetter: React.Dispatch<React.SetStateAction<number>>;
   text: string;
   curLetter: number;
+  started: boolean;
 };
 
-export default function Challenge({difficulty='easy', charColor, setCharColor, setCurLetter, text='', curLetter}: ChallengeProps) {
+export default function Challenge({difficulty='easy', charColor, setCharColor, setCurLetter, text='', curLetter, started}: ChallengeProps) {
 
   const handleKeyDown = (e:any) => {
     // for debugging purposes.
@@ -31,16 +32,17 @@ export default function Challenge({difficulty='easy', charColor, setCharColor, s
   }
 
   useEffect(() => {
+    if(!started) return;
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     }
-  }, [text, curLetter])
+  }, [text, curLetter, started])
 
   return(
     <Suspense fallback={<p>Loading...</p>}>
-    <div className='py-10 px-8 text-start flex flex-wrap gap-0.5'>
+    <div className={`py-10 px-8 text-start flex flex-wrap gap-0.5 ${started ? '' : 'blur-sm'}`}>
       {text && text.split('').map((char, idx) => (
         <p key={`key-${idx}`} className={`${charColor.get(idx)}`}>{char}</p>
       ))}
