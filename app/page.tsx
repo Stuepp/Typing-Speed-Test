@@ -9,6 +9,7 @@ import { getChallenge } from "./actions/challenge";
 export default function Home() {
   // Challenge Info
   const [precision, setPrecision] = useState<number>(0);
+  const [wpm, setWpm] = useState<number>(0);
   // Challenge
   const [difficulty, setDifficulty] = useState<string>('easy'); // easy | medium | hard
   const [charColor, setCharColor] = useState<Map<number,string>>(new Map());
@@ -17,9 +18,12 @@ export default function Home() {
   const [started, setStarted] = useState<boolean>(false);
   const [arrT, setArrT] = useState<string[]>([]);
 
-  const [correctWords, setCorrectWords] = useState<number>(0);
-  const [incorrectWords, setIncorrectWords] = useState<number>(0);
-
+  const [correctLetters, setCorrectLetters] = useState<number>(0);
+  const [incorrectLetters, setIncorrectLetters] = useState<number>(0);
+  const [words, setWords] = useState<number>(0);
+  const [initialTime, setInitialTime] = useState<number>(0);
+  const [finalTime, setFinalTime] = useState<number>(0);
+ 
   const handleDifficulty = (label: string) => {
     setDifficulty(label.toLowerCase());
     setStarted(false);
@@ -34,14 +38,19 @@ export default function Home() {
         });
       });
       setCurLetter(0); // sets current letter index to 0. -- Where the player starts.
+      setInitialTime(Date.now());
     } catch(e) {
       console.error(e);
     }
   }
 
   const results = () => {
-    const precision = (correctWords / (correctWords + incorrectWords)) * 100;
+    setFinalTime(Date.now());
+    const precision = (correctLetters / (correctLetters + incorrectLetters)) * 100;
     setPrecision(precision.toFixed(2) as unknown as number);
+    const time = (finalTime - initialTime) / 1000 / 60; // time in minutes.
+    const wpm = words / -time;
+    setWpm(wpm.toFixed(2) as unknown as number);
   };
 
   useEffect(() => {
@@ -56,9 +65,11 @@ export default function Home() {
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 min-h-screen w-full flex-col items-center justify-start py-32 px-8 bg-white dark:bg-black sm:items-start">
         <ChallengeInfo
-         difficulty={difficulty}
-         handleDifficulty={(label) => handleDifficulty(label)}
-         precision={precision}
+          started={started}
+          difficulty={difficulty}
+          handleDifficulty={(label) => handleDifficulty(label)}
+          precision={precision}
+          wpm={wpm}
         />
         
         <div className="relative w-full">
@@ -76,8 +87,9 @@ export default function Home() {
             text={text}
             curLetter={curLetter}
             started={started}
-            setCorrectWords={setCorrectWords}
-            setIncorrectWords={setIncorrectWords}
+            setCorrectLetters={setCorrectLetters}
+            setIncorrectLetters={setIncorrectLetters}
+            setWords={setWords}
           />
         </div>
       </main>

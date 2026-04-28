@@ -8,11 +8,12 @@ interface ChallengeProps{
   text: string;
   curLetter: number;
   started: boolean;
-  setCorrectWords: React.Dispatch<React.SetStateAction<number>>;
-  setIncorrectWords: React.Dispatch<React.SetStateAction<number>>;
+  setCorrectLetters: React.Dispatch<React.SetStateAction<number>>;
+  setIncorrectLetters: React.Dispatch<React.SetStateAction<number>>;
+  setWords: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function Challenge({difficulty='easy', charColor, setCharColor, setCurLetter, text='', curLetter, started, setCorrectWords, setIncorrectWords}: ChallengeProps) {
+export default function Challenge({difficulty='easy', charColor, setCharColor, setCurLetter, text='', curLetter, started, setCorrectLetters, setIncorrectLetters, setWords}: ChallengeProps) {
 
   const handleKeyDown = (e:any) => {
     // for debugging purposes.
@@ -26,12 +27,13 @@ export default function Challenge({difficulty='easy', charColor, setCharColor, s
     if(String(e.key).length === 1) {
       if (text[curLetter] === e.key) {
         setCharColor(charColor.set(curLetter, 'text-correct text-lg'))
-        setCorrectWords((w) => w+1)
+        setCorrectLetters((l) => l+1)
       } else {
         setCharColor((prev) => prev.set(curLetter, 'text-incorrect text-lg'))
-        setIncorrectWords((w) => w+1)
+        setIncorrectLetters((l) => l+1)
       }
       setCurLetter((l) => l+1)
+      if(text[curLetter] === ' ') setWords((w) => w+1);
     };
   }
 

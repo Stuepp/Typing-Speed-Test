@@ -1,26 +1,36 @@
 'use client'
 
-import { lazy, useState } from "react"
+import { lazy, useEffect, useState } from "react"
 
 import Button from "./Button";
 
 interface ChallengeInfoProps {
   difficulty: string;
   handleDifficulty: (arg0: string) => void;
-  precision?: number;
+  precision: number;
+  wpm: number;
+  started: boolean;
 };
 
 
-export default function ChallengeInfo({difficulty='easy', handleDifficulty, precision}: ChallengeInfoProps) {
+export default function ChallengeInfo({difficulty='easy', handleDifficulty, precision, wpm, started}: ChallengeInfoProps) {
   
   const [mode, SetMode] = useState<Boolean>(false);
-  const [wpm, setWpm] = useState<number>(0);
   const [time, setTime] = useState<number>(60);
 
   const handleMode = () => {
     SetMode((prev) => !prev);
   }
   
+  /*
+  useEffect(() => {
+    if(!started) return;
+
+    setInterval(() => {
+      setTime(time-1);
+    }, 1000);
+  }, [time, started]);
+  */
 
   return(
     <div className='flex flex-row text-gray-400 gap-10 w-full justify-center'>
