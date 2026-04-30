@@ -29,7 +29,7 @@ export default function Challenge({difficulty='easy', charColor, setCharColor, s
         setCharColor(charColor.set(curLetter, 'text-correct'))
         setCorrectLetters((l) => l+1)
       } else {
-        setCharColor((prev) => prev.set(curLetter, 'text-incorrect'))
+        setCharColor((prev) => prev.set(curLetter, 'text-incorrect underline underline-offset-1'))
         setIncorrectLetters((l) => l+1)
       }
       setCurLetter((l) => l+1)

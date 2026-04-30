@@ -55,10 +55,6 @@ export default function Home() {
     wpm === 0 
       ? setWpm(1)
       : setWpm(wpm.toFixed(2) as unknown as number);
-
-    setWords(0);
-    setCorrectLetters(0);
-    setIncorrectLetters(0);
   };
 
   useEffect(() => {
@@ -67,7 +63,6 @@ export default function Home() {
       setStarted(false);
       results();
       setCompleted(true);
-      
     }
   },[curLetter]);
 
@@ -86,6 +81,9 @@ export default function Home() {
           wrongLetters={incorrectLetters}
           completed={completed}
           setCompleted={setCompleted}
+          setCorrectLetters={setCorrectLetters}
+          setIncorrectLetters={setIncorrectLetters}
+          setWords={setWords}
         />
       </div>
       

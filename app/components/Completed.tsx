@@ -5,9 +5,12 @@
   wrongLetters: number;
   completed: boolean;
   setCompleted: React.Dispatch<React.SetStateAction<boolean>>;
+  setWords: React.Dispatch<React.SetStateAction<number>>;
+  setCorrectLetters: React.Dispatch<React.SetStateAction<number>>;
+  setIncorrectLetters: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function Completed({wpm, precision, correctLetters, wrongLetters, completed, setCompleted} : CompletedProps) {
+export default function Completed({wpm, precision, correctLetters, wrongLetters, completed, setCompleted, setWords, setCorrectLetters, setIncorrectLetters} : CompletedProps) {
   const box_qtd = [['WPM', wpm], ['Precision', precision], ['Characters', correctLetters, wrongLetters]];
 
   const title = [
@@ -21,6 +24,13 @@ export default function Completed({wpm, precision, correctLetters, wrongLetters,
     'Solid run. Keep pushing to beat your high score.',
     "You're getting faster. That was incredible typing."
   ]
+
+  const redo = () => {
+    setCompleted(false);
+    setWords(0);
+    setCorrectLetters(0);
+    setIncorrectLetters(0);
+  }
 
   return(
     <div className="flex flex-col items-center">
