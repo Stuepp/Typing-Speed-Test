@@ -1,11 +1,54 @@
 'use client'
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, Dispatch, SetStateAction, useContext } from "react";
 
 import ChallengeInfo from "./components/ChallengeInfo";
 import Challenge from "./components/Challenge";
 import { getChallenge } from "./actions/challenge";
 import Completed from "./components/Completed";
+
+interface DifficultyContextType {
+  difficulty: string; //'easy' | 'medium' | 'hard';
+  setDifficulty: Dispatch<SetStateAction<string>>;
+}
+
+interface ModeContextType {
+  mode: boolean; // true: timed // false: passaged
+  setMode: Dispatch<SetStateAction<boolean>>;
+}
+
+interface StartedContextType {
+  started: boolean;
+  setStarted: Dispatch<SetStateAction<boolean>>;
+}
+
+export const DifficultyContext = createContext<DifficultyContextType | null>(null); // easy | medium | hard
+export const ModeContext = createContext<ModeContextType | null>(null); // Timed | Passage
+export const StartedContext = createContext<StartedContextType | null>(null); // True | False
+
+export function useDifficulty () {
+  const context = useContext(DifficultyContext);
+  if(!context){
+    throw new Error('useDifficulty must be used inside a DifficultyProvider');
+  }
+  return context;
+}
+
+export function useMode() {
+  const context = useContext(ModeContext);
+  if(!context){
+    throw new Error('useMode must be used inside a ModeProvider');
+  }
+  return context;
+}
+
+export function useStaterted() {
+  const context = useContext(StartedContext);
+  if(!context) {
+    throw new Error('useStarted must be used inside a StartedProvider');
+  }
+  return context;
+}
 
 export default function Home() {
   // Challenge Info
@@ -13,6 +56,7 @@ export default function Home() {
   const [wpm, setWpm] = useState<number>(0);
   // Challenge
   const [difficulty, setDifficulty] = useState<string>('easy'); // easy | medium | hard
+  const [mode, setMode] = useState<boolean>(true);
   const [charColor, setCharColor] = useState<Map<number,string>>(new Map());
   const [text, setText] = useState<string>('');
   const [curLetter, setCurLetter] = useState<number>(0);
@@ -26,8 +70,8 @@ export default function Home() {
   const [initialTime, setInitialTime] = useState<number>(0);
   const [finalTime, setFinalTime] = useState<number>(0);
  
-  const handleDifficulty = (label: string) => {
-    setDifficulty(label.toLowerCase());
+  const handleDifficulty = (label:string) => {
+    setDifficulty(label);
     setStarted(false);
     // set Text color to white.
     try{
@@ -72,51 +116,53 @@ export default function Home() {
   }, [])
 
   return (
-    <main className="flex min-h-screen bg-zinc-50 font-sans dark:bg-black">
-      <div className={`flex flex-1 justify-center ${completed ? 'visible' : 'hidden'}`}>
-        <Completed
-          wpm={wpm}
-          precision={precision}
-          correctLetters={correctLetters}
-          wrongLetters={incorrectLetters}
-          completed={completed}
-          setCompleted={setCompleted}
-          setCorrectLetters={setCorrectLetters}
-          setIncorrectLetters={setIncorrectLetters}
-          setWords={setWords}
-        />
-      </div>
-      
-      <div className={`flex flex-1 min-h-screen w-full flex-col items-center justify-start py-32 px-8 bg-white dark:bg-black sm:items-start ${completed ? 'hidden' : 'visible'}`}>
-        <ChallengeInfo
-          started={started}
-          difficulty={difficulty}
-          handleDifficulty={(label) => handleDifficulty(label)}
-          precision={precision}
-          wpm={wpm}
-        />
-        
-        <div className="relative w-full">
-          <button
-            onClick={() => setStarted(true)}
-            className={`bg-cyan-400 text-default p-3 rounded-xl absolute left-1/2 top-1/2 cursor-pointer z-50 ${started && !completed ? 'hidden' : 'visible'} `}
-          >
-            Start Typing Test
-          </button>
-          <Challenge
-            difficulty={difficulty}
-            charColor={charColor}
-            setCharColor={setCharColor}
-            setCurLetter={setCurLetter}
-            text={text}
-            curLetter={curLetter}
-            started={started}
+    <StartedContext value={{started, setStarted}}>
+    <DifficultyContext value={{difficulty, setDifficulty}}>
+    <ModeContext value={{mode, setMode}}>
+      <main className="flex min-h-screen bg-zinc-50 font-sans dark:bg-black">
+        <div className={`flex flex-1 justify-center ${completed ? 'visible' : 'hidden'}`}>
+          <Completed
+            wpm={wpm}
+            precision={precision}
+            correctLetters={correctLetters}
+            wrongLetters={incorrectLetters}
+            completed={completed}
+            setCompleted={setCompleted}
             setCorrectLetters={setCorrectLetters}
             setIncorrectLetters={setIncorrectLetters}
             setWords={setWords}
           />
         </div>
-      </div>
-    </main>
+
+        <div className={`flex flex-1 min-h-screen w-full flex-col items-center justify-start py-32 px-8 bg-white dark:bg-black sm:items-start ${completed ? 'hidden' : 'visible'}`}>
+          <ChallengeInfo
+            handleDifficulty={(label: string) => handleDifficulty(label)}
+            precision={precision}
+            wpm={wpm}
+          />
+
+          <div className="relative w-full">
+            <button
+              onClick={() => setStarted(true)}
+              className={`bg-cyan-400 text-default p-3 rounded-xl absolute left-1/2 top-1/2 cursor-pointer z-50 ${started && !completed ? 'hidden' : 'visible'} `}
+            >
+              Start Typing Test
+            </button>
+            <Challenge
+              charColor={charColor}
+              setCharColor={setCharColor}
+              setCurLetter={setCurLetter}
+              text={text}
+              curLetter={curLetter}
+              setCorrectLetters={setCorrectLetters}
+              setIncorrectLetters={setIncorrectLetters}
+              setWords={setWords}
+            />
+          </div>
+        </div>
+      </main>
+    </ModeContext>
+    </DifficultyContext>
+    </StartedContext>
   );
 }
