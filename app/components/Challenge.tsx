@@ -1,20 +1,21 @@
-import { useState, useEffect, Suspense } from 'react';
+import { useEffect, Suspense } from 'react';
+
+import { useStaterted } from "@/app/page";
 
 interface ChallengeProps{
-  difficulty: string;
   charColor: Map<number, string>;
   setCharColor: React.Dispatch<React.SetStateAction<Map<number, string>>>;
   setCurLetter: React.Dispatch<React.SetStateAction<number>>;
   text: string;
   curLetter: number;
-  started: boolean;
   setCorrectLetters: React.Dispatch<React.SetStateAction<number>>;
   setIncorrectLetters: React.Dispatch<React.SetStateAction<number>>;
   setWords: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function Challenge({difficulty='easy', charColor, setCharColor, setCurLetter, text='', curLetter, started, setCorrectLetters, setIncorrectLetters, setWords}: ChallengeProps) {
-
+export default function Challenge({charColor, setCharColor, setCurLetter, text='', curLetter, setCorrectLetters, setIncorrectLetters, setWords}: ChallengeProps) {
+  const {started, setStarted} = useStaterted();
+  
   const handleKeyDown = (e:any) => {
     // for debugging purposes.
     /*
