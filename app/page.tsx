@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, createContext, Dispatch, SetStateAction, useContext } from "react";
+import { useEffect, useState, createContext, Dispatch, SetStateAction, useContext, useRef } from "react";
 
 import ChallengeInfo from "./components/ChallengeInfo";
 import Challenge from "./components/Challenge";
@@ -22,9 +22,15 @@ interface StartedContextType {
   setStarted: Dispatch<SetStateAction<boolean>>;
 }
 
+interface CompletedContextType {
+  completed: boolean;
+  setCompleted: Dispatch<SetStateAction<boolean>>;
+}
+
 export const DifficultyContext = createContext<DifficultyContextType | null>(null); // easy | medium | hard
 export const ModeContext = createContext<ModeContextType | null>(null); // Timed | Passage
 export const StartedContext = createContext<StartedContextType | null>(null); // True | False
+export const CompletedContext = createContext<CompletedContextType | null>(null); // True | False
 
 export function useDifficulty () {
   const context = useContext(DifficultyContext);
@@ -50,25 +56,34 @@ export function useStaterted() {
   return context;
 }
 
+export function useCompleted() {
+  const context = useContext(CompletedContext);
+  if(!context) {
+    throw new Error('useCompleted must be used inside a StartedProvider');
+  }
+  return context;
+}
+
 export default function Home() {
   // Challenge Info
   const [precision, setPrecision] = useState<number>(0);
   const [wpm, setWpm] = useState<number>(0);
-  // Challenge
+  // Challenge - Context
   const [difficulty, setDifficulty] = useState<string>('easy'); // easy | medium | hard
   const [mode, setMode] = useState<boolean>(true);
+  const [started, setStarted] = useState<boolean>(false);
+  const [completed, setCompleted] = useState<boolean>(true);
+  // Challenge
   const [charColor, setCharColor] = useState<Map<number,string>>(new Map());
   const [text, setText] = useState<string>('');
   const [curLetter, setCurLetter] = useState<number>(0);
-  const [started, setStarted] = useState<boolean>(false);
-  const [completed, setCompleted] = useState<boolean>(true);
   const [arrT, setArrT] = useState<string[]>([]);
 
   const [correctLetters, setCorrectLetters] = useState<number>(0);
   const [incorrectLetters, setIncorrectLetters] = useState<number>(0);
-  const [words, setWords] = useState<number>(0);
-  const [initialTime, setInitialTime] = useState<number>(0);
-  const [finalTime, setFinalTime] = useState<number>(0);
+  let words = useRef<number>(0);
+  let initialTime = useRef<number>(0);
+  let finalTime = useRef<number>(0);
  
   const handleDifficulty = (label:string) => {
     setDifficulty(label);
@@ -84,21 +99,21 @@ export default function Home() {
         });
       });
       setCurLetter(0); // sets current letter index to 0. -- Where the player starts.
-      setInitialTime(Date.now());
+      initialTime.current = Date.now();
     } catch(e) {
       console.error(e);
     }
   }
 
   const results = () => {
-    setFinalTime(Date.now());
+    finalTime.current = Date.now();
     const precision = (correctLetters / (correctLetters + incorrectLetters)) * 100;
     setPrecision(precision.toFixed(2) as unknown as number);
-    const time = (finalTime - initialTime) / 1000 / 60; // time in minutes.
-    const wpm = words / -time;
-    wpm === 0 
+    const time = (finalTime.current - initialTime.current) / 1000 / 60; // time in minutes.
+    const wordsTimed = words.current / time;
+    wordsTimed === 0 
       ? setWpm(1)
-      : setWpm(wpm.toFixed(2) as unknown as number);
+      : setWpm(wordsTimed.toFixed(2) as unknown as number);
   };
 
   useEffect(() => {
@@ -117,6 +132,7 @@ export default function Home() {
 
   return (
     <StartedContext value={{started, setStarted}}>
+    <CompletedContext value={{completed, setCompleted}}>
     <DifficultyContext value={{difficulty, setDifficulty}}>
     <ModeContext value={{mode, setMode}}>
       <main className="flex min-h-screen bg-zinc-50 font-sans dark:bg-black">
@@ -126,11 +142,9 @@ export default function Home() {
             precision={precision}
             correctLetters={correctLetters}
             wrongLetters={incorrectLetters}
-            completed={completed}
-            setCompleted={setCompleted}
             setCorrectLetters={setCorrectLetters}
             setIncorrectLetters={setIncorrectLetters}
-            setWords={setWords}
+            words={words}
           />
         </div>
 
@@ -156,13 +170,14 @@ export default function Home() {
               curLetter={curLetter}
               setCorrectLetters={setCorrectLetters}
               setIncorrectLetters={setIncorrectLetters}
-              setWords={setWords}
+              words={words}
             />
           </div>
         </div>
       </main>
     </ModeContext>
     </DifficultyContext>
+    </CompletedContext>
     </StartedContext>
   );
 }
