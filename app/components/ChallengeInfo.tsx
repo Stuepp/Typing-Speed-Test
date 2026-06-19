@@ -1,36 +1,46 @@
 'use client'
 
-import { lazy, useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+
+import { useDifficulty, useStaterted } from "@/app/page";
 
 import Button from "./Button";
 
 interface ChallengeInfoProps {
-  difficulty: string;
   handleDifficulty: (arg0: string) => void;
   precision: number;
   wpm: number;
-  started: boolean;
 };
 
-
-export default function ChallengeInfo({difficulty='easy', handleDifficulty, precision, wpm, started}: ChallengeInfoProps) {
-  
+export default function ChallengeInfo({handleDifficulty, precision, wpm}: ChallengeInfoProps) {
+  const {difficulty} = useDifficulty();
+  const {started, setStarted} = useStaterted();
   const [mode, SetMode] = useState<Boolean>(false);
   const [time, setTime] = useState<number>(60);
 
   const handleMode = () => {
+    setStarted(false);
     SetMode((prev) => !prev);
+    resetTimer();
   }
-  
-  /*
-  useEffect(() => {
-    if(!started) return;
 
-    setInterval(() => {
-      setTime(time-1);
+  const descreaseTimer = () => setTime((prev) => prev - 1);
+
+  const resetTimer = () => setTime(60);
+  
+  useEffect(() => {
+    if(!started) {
+      setTime(60);
+      return;
+    }
+    if (time <= 0) return;
+
+    const timerId = setInterval(() => {
+      descreaseTimer();
     }, 1000);
+
+    return () => clearInterval(timerId);
   }, [time, started]);
-  */
 
   return(
     <div className='flex flex-row text-gray-400 gap-10 w-full justify-center'>
@@ -49,7 +59,7 @@ export default function ChallengeInfo({difficulty='easy', handleDifficulty, prec
         </div>
         <div className="flex flex-row items-center gap-0.5">
           <p>Mode:</p>
-          <Button onClick={handleMode} label={`Timed (${time}s)`} active={!mode} />
+          <Button onClick={handleMode} label={`Timed (60s)`} active={!mode} />
           <Button onClick={handleMode} label="Passage" active={!!mode} />
         </div>
       </div>
