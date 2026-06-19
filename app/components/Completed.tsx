@@ -1,16 +1,17 @@
-﻿interface CompletedProps{
+﻿import { useCompleted } from "../page";
+
+interface CompletedProps{
   wpm: number;
   precision: number;
   correctLetters: number;
   wrongLetters: number;
-  completed: boolean;
-  setCompleted: React.Dispatch<React.SetStateAction<boolean>>;
-  setWords: React.Dispatch<React.SetStateAction<number>>;
+  words: React.RefObject<number>;
   setCorrectLetters: React.Dispatch<React.SetStateAction<number>>;
   setIncorrectLetters: React.Dispatch<React.SetStateAction<number>>;
 };
 
-export default function Completed({wpm, precision, correctLetters, wrongLetters, completed, setCompleted, setWords, setCorrectLetters, setIncorrectLetters} : CompletedProps) {
+export default function Completed({wpm, precision, correctLetters, wrongLetters, words, setCorrectLetters, setIncorrectLetters} : CompletedProps) {
+  const {completed, setCompleted} = useCompleted();
   const box_qtd = [['WPM', wpm], ['Precision', precision], ['Characters', correctLetters, wrongLetters]];
 
   const title = [
@@ -27,7 +28,7 @@ export default function Completed({wpm, precision, correctLetters, wrongLetters,
 
   const redo = () => {
     setCompleted(false);
-    setWords(0);
+    words.current = 0;
     setCorrectLetters(0);
     setIncorrectLetters(0);
   }
