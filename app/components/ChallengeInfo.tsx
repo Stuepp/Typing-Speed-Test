@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 
-import { useDifficulty, useStaterted } from "@/app/page";
+import { useCompleted, useDifficulty, useStaterted } from "@/app/page";
 
 import Button from "./Button";
 
@@ -15,6 +15,7 @@ interface ChallengeInfoProps {
 export default function ChallengeInfo({handleDifficulty, precision, wpm}: ChallengeInfoProps) {
   const {difficulty} = useDifficulty();
   const {started, setStarted} = useStaterted();
+  const {setCompleted} = useCompleted();
   const [mode, SetMode] = useState<Boolean>(false);
   const [time, setTime] = useState<number>(60);
 
@@ -27,13 +28,19 @@ export default function ChallengeInfo({handleDifficulty, precision, wpm}: Challe
   const descreaseTimer = () => setTime((prev) => prev - 1);
 
   const resetTimer = () => setTime(60);
+
+  const stopChallange = () => {
+    setStarted(false);
+    setCompleted(true);
+    return;
+  }
   
   useEffect(() => {
     if(!started) {
       setTime(60);
       return;
     }
-    if (time <= 0) return;
+    if (time <= 0) stopChallange();
 
     const timerId = setInterval(() => {
       descreaseTimer();
