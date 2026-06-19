@@ -10,10 +10,10 @@ interface ChallengeProps{
   curLetter: number;
   setCorrectLetters: React.Dispatch<React.SetStateAction<number>>;
   setIncorrectLetters: React.Dispatch<React.SetStateAction<number>>;
-  setWords: React.Dispatch<React.SetStateAction<number>>;
+  words: React.RefObject<number>;
 };
 
-export default function Challenge({charColor, setCharColor, setCurLetter, text='', curLetter, setCorrectLetters, setIncorrectLetters, setWords}: ChallengeProps) {
+export default function Challenge({charColor, setCharColor, setCurLetter, text='', curLetter, setCorrectLetters, setIncorrectLetters, words}: ChallengeProps) {
   const {started, setStarted} = useStaterted();
   
   const handleKeyDown = (e:any) => {
@@ -34,7 +34,7 @@ export default function Challenge({charColor, setCharColor, setCurLetter, text='
         setIncorrectLetters((l) => l+1)
       }
       setCurLetter((l) => l+1)
-      if(e.key === ' ') setWords((w) => w+1);
+      if(e.key === ' ') words.current = (words.current + 1);
     };
   }
 
